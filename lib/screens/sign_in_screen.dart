@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 
-class SignInScreen extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
+class SignInScreen extends StatefulWidget {
+  const SignInScreen({super.key});
 
-  SignInScreen({super.key});
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  final _formKey = GlobalKey<FormState>();
+  String? phone;
+  String? password;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +20,7 @@ class SignInScreen extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
                   SizedBox(height: constraints.maxHeight * 0.1),
@@ -24,110 +31,60 @@ class SignInScreen extends StatelessWidget {
                   SizedBox(height: constraints.maxHeight * 0.1),
                   Text(
                     "Sign In",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall!
-                        .copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: constraints.maxHeight * 0.05),
+
                   Form(
                     key: _formKey,
                     child: Column(
                       children: [
                         TextFormField(
-                          decoration: const InputDecoration(
-                            hintText: 'Phone',
-                            filled: true,
-                            fillColor: Color(0xFFF5FCF9),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16.0 * 1.5, vertical: 16.0), // const dihapus di sini karena sudah ada di level decoration
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(50)),
-                            ),
-                          ),
                           keyboardType: TextInputType.phone,
-                          onSaved: (phone) {
-                            // Save it
-                          },
+                          decoration: _inputDecoration("Phone"),
+                          validator: (value) =>
+                              value!.isEmpty ? "Phone wajib diisi" : null,
+                          onSaved: (value) => phone = value,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
-                          child: TextFormField(
-                            obscureText: true,
-                            decoration: const InputDecoration(
-                              hintText: 'Password',
-                              filled: true,
-                              fillColor: Color(0xFFF5FCF9),
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16.0 * 1.5, vertical: 16.0),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(50)),
-                              ),
-                            ),
-                            onSaved: (password) { // Typo diperbaiki: passaword -> password
-                              // Save it
-                            },
-                          ),
+
+                        const SizedBox(height: 16),
+
+                        TextFormField(
+                          obscureText: true,
+                          decoration: _inputDecoration("Password"),
+                          validator: (value) =>
+                              value!.length < 6 ? "Minimal 6 karakter" : null,
+                          onSaved: (value) => password = value,
                         ),
+
+                        const SizedBox(height: 16),
+
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               _formKey.currentState!.save();
+
+                              Navigator.pushNamed(context, '/otp');
                             }
                           },
-                          style: ElevatedButton.styleFrom(
-                            elevation: 0,
-                            backgroundColor: const Color(0xFF00BF6D),
-                            foregroundColor: Colors.white,
-                            minimumSize: const Size(double.infinity, 48),
-                            shape: const StadiumBorder(),
-                          ),
+                          style: _buttonStyle(const Color(0xFF00BF6D)),
                           child: const Text("Sign in"),
                         ),
-                        const SizedBox(height: 16.0),
+
+                        const SizedBox(height: 16),
+
                         TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Forgot Password?',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .color!
-                                      .withValues(alpha: 0.64), // Perubahan: withOpacity -> withValues
-                                ),
-                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/confirm-password');
+                          },
+                          child: const Text("Forgot Password?"),
                         ),
+
                         TextButton(
                           onPressed: () {},
-                          child: Text.rich(
-                            TextSpan(
-                              text: "Don’t have an account? ",
-                              children: const [ // const dipindah ke sini
-                                TextSpan(
-                                  text: "Sign Up",
-                                  style: TextStyle(color: Color(0xFF00BF6D)),
-                                ),
-                              ],
-                            ),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .color!
-                                      .withValues(alpha: 0.64), // Perubahan: withOpacity -> withValues
-                                ),
-                          ),
+                          child: const Text("Don’t have an account? Sign Up"),
                         ),
                       ],
                     ),
@@ -138,6 +95,28 @@ class SignInScreen extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: const Color(0xFFF5FCF9),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(50),
+        borderSide: BorderSide.none,
+      ),
+    );
+  }
+
+  ButtonStyle _buttonStyle(Color color) {
+    return ElevatedButton.styleFrom(
+      backgroundColor: color,
+      foregroundColor: Colors.white,
+      minimumSize: const Size(double.infinity, 48),
+      shape: const StadiumBorder(),
     );
   }
 }
