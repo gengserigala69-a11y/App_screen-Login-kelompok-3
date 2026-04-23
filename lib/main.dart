@@ -29,11 +29,12 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Login App',
+      // UBAH BAGIAN INI:
+      title: 'UTS Kelas B - Kelompok 3', 
       theme: ThemeData(primarySwatch: Colors.green),
       initialRoute: '/signin',
       routes: {
-        '/signin': (context) => SignInScreen(),
+        '/signin': (context) => const SignInScreen(),
         '/otp': (context) => const OtpScreen(),
         '/confirm-password': (context) => const ConfirmPasswordScreen(),
         '/error': (context) => const Error404Screen(),
